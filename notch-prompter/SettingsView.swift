@@ -66,14 +66,14 @@ struct SettingsView: View {
             .padding(.top, 16)
             
             // Tab content
-            TabView(selection: $selectedTab) {
-                TextTabView(viewModel: viewModel)
-                    .tag(SettingsTab.text)
-                
-                SettingsTabView(viewModel: viewModel, appVersion: appVersion)
-                    .tag(SettingsTab.settings)
+            Group {
+                switch selectedTab {
+                case .text:
+                    TextTabView(viewModel: viewModel)
+                case .settings:
+                    SettingsTabView(viewModel: viewModel, appVersion: appVersion)
+                }
             }
-            .tabViewStyle(.automatic)
         }
         .navigationTitle("Preferences")
         .frame(width: 650, height: 650)
