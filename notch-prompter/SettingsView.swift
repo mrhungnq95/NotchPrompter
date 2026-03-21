@@ -91,21 +91,16 @@ struct TextTabView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
-                SectionHeader("Edit your prompter text", paddingTop: 0)
-                
+                SectionHeader("Your prompter text", paddingTop: 0)
                 TextEditor(text: $viewModel.text)
-                    .font(.system(size: 14))
-                    .frame(minHeight: 400)
-                    .padding(6)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.secondary.opacity(0.3))
-                    )
-                
-                Text("Tip: Your text will scroll continuously. The prompter automatically loops when it reaches the end.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .padding(.top, 4)
+                    .font(.system(size: 15))
+                    .lineSpacing(2.5)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .frame(minHeight: 520)
+                    .scrollContentBackground(.hidden)
+                    .background(.gray.tertiary)
+                    .cornerRadius(8)
             }
             .padding(24)
         }
@@ -208,6 +203,14 @@ struct SettingsTabView: View {
                 Toggle("Pause prompter on mouse hover", isOn: $viewModel.pauseOnHover)
                 
                 Text("Tip: When hovering over the prompter with pause enabled, you can use your mouse wheel or trackpad to manually scroll up and down through the text.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 4)
+                    .padding(.bottom, 8)
+                
+                Toggle("Show hover controls", isOn: $viewModel.showHoverControls)
+                
+                Text("Tip: When enabled, play/pause, back, and settings buttons appear at the bottom of the prompter when you hover over it.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .padding(.top, 4)

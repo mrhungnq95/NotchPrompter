@@ -159,6 +159,7 @@ class PrompterHostingView: NSView {
 struct PrompterContentView: View {
     @ObservedObject var viewModel: PrompterViewModel
     @Binding var contentHeight: CGFloat
+    @State private var showControls = false
 
     var body: some View {
         ZStack {
@@ -209,9 +210,105 @@ struct PrompterContentView: View {
                     .allowsHitTesting(false)
                 }
             }
+            
+            // Hover controls overlay
+            if showControls && viewModel.showHoverControls {
+                VStack {
+                    Spacer()
+                    
+                    HStack(spacing: 16) {
+                        // Play/Pause button
+                        Button(action: {
+                            if viewModel.isPlaying {
+                                viewModel.pause()
+                            } else {
+                                viewModel.play()
+                            }
+                        }) {
+                            Image(systemName: viewModel.isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                                .font(.system(size: 32))
+                                .foregroundColor(.white)
+                                .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(viewModel.voiceActivation)
+                        .opacity(viewModel.voiceActivation ? 0.5 : 1.0)
+                        .help(viewModel.voiceActivation ? "Disabled during voice activation" : (viewModel.isPlaying ? "Pause" : "Play"))
+                        
+                        // Back button (scroll back)
+                        Button(action: {
+                            viewModel.scrollBack()
+                        }) {
+                            Image(systemName: "arrow.uturn.backward.circle.fill")
+                                .font(.system(size: 32))
+                                .foregroundColor(.white)
+                                .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
+                        }
+                        .buttonStyle(.plain)
+                        .help("Go back \(Int(viewModel.backScrollAmount)) pixels")
+                        
+                        // Settings button
+                        Button(action: {
+                            openSettingsWindow()
+                        }) {
+                            Image(systemName: "gearshape.circle.fill")
+                                .font(.system(size: 32))
+                                .foregroundColor(.white)
+                                .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
+                        }
+                        .buttonStyle(.plain)
+                        .help("Open Settings")
+                    }
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.black.opacity(0.75))
+                            .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+                    )
+                    .padding(.bottom, 24)
+                }
+                .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                .animation(.easeInOut(duration: 0.2), value: showControls)
+            }
         }
         .opacity(viewModel.opacity)
         .ignoresSafeArea()
+        .onHover { hovering in
+            withAnimation {
+                showControls = hovering
+            }
+        }
+    }
+    
+    private func openSettingsWindow() {
+        // Activate the app
+        NSApp.activate(ignoringOtherApps: true)
+        
+        // Try to find existing settings window first
+        for window in NSApp.windows {
+            if window.title == "NotchPrompter" {
+                window.makeKeyAndOrderFront(nil)
+                return
+            }
+        }
+        
+        // Simulate the Command+, keyboard shortcut which opens Settings
+        let keyDown = NSEvent.keyEvent(
+            with: .keyDown,
+            location: NSPoint.zero,
+            modifierFlags: .command,
+            timestamp: ProcessInfo.processInfo.systemUptime,
+            windowNumber: 0,
+            context: nil,
+            characters: ",",
+            charactersIgnoringModifiers: ",",
+            isARepeat: false,
+            keyCode: 43 // Key code for comma
+        )
+        
+        if let event = keyDown {
+            NSApp.postEvent(event, atStart: true)
+        }
     }
     
     private var movingText: some View {

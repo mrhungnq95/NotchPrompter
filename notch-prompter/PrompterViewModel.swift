@@ -43,13 +43,16 @@ final class PrompterViewModel: ObservableObject {
     @Published var voiceActivation: Bool = false
     @Published var autoGain: Bool = true
     @Published var isPrompterVisible: Bool = true
-    @Published var fontDesign: Font.Design = .default
+    @Published var fontDesign: Font.Design = .monospaced
     @Published var selectedScreenIndex: Int = 0
     @Published var opacity: Double = 1.0
     @Published var enableTopFade: Bool = true
     @Published var enableBottomFade: Bool = true
     @Published var topFadeHeight: Double = 40.0
     @Published var bottomFadeHeight: Double = 40.0
+    @Published var showHoverControls: Bool = true
+    
+    var backScrollAmount: Double = 20.0 // pixels to scroll back
     
     
     private var timerCancellable: AnyCancellable?
@@ -80,6 +83,7 @@ final class PrompterViewModel: ObservableObject {
         static let enableBottomFade = "EnableBottomFade"
         static let topFadeHeight = "TopFadeHeight"
         static let bottomFadeHeight = "BottomFadeHeight"
+        static let showHoverControls = "ShowHoverControls"
     }
     
     // MARK: Init
@@ -182,6 +186,10 @@ final class PrompterViewModel: ObservableObject {
         lastTick = nil
     }
     
+    func scrollBack() {
+        offset = max(0, offset - backScrollAmount)
+    }
+    
     // MARK: Timer
     private func startTimer() {
         timerCancellable = CADisplayLinkPublisher()
@@ -222,6 +230,7 @@ final class PrompterViewModel: ObservableObject {
         $enableBottomFade.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $topFadeHeight.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $bottomFadeHeight.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
+        $showHoverControls.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
     }
     
     private func loadSettings() {
@@ -257,6 +266,7 @@ final class PrompterViewModel: ObservableObject {
         if topFadeHeight == 0 { topFadeHeight = 40.0 }
         bottomFadeHeight = defaults.double(forKey: Keys.bottomFadeHeight)
         if bottomFadeHeight == 0 { bottomFadeHeight = 40.0 }
+        showHoverControls = defaults.object(forKey: Keys.showHoverControls) as? Bool ?? true
     }
     
     private func saveSettings() {
@@ -277,6 +287,7 @@ final class PrompterViewModel: ObservableObject {
         defaults.set(enableBottomFade, forKey: Keys.enableBottomFade)
         defaults.set(topFadeHeight, forKey: Keys.topFadeHeight)
         defaults.set(bottomFadeHeight, forKey: Keys.bottomFadeHeight)
+        defaults.set(showHoverControls, forKey: Keys.showHoverControls)
     }
     
     // MARK: Connector for display refresh
