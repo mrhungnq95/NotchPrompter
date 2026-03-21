@@ -67,6 +67,16 @@ final class PrompterWindow {
                 }
             }
             .store(in: &cancellables)
+        
+        viewModel.$hideFromScreenRecording
+            .receive(on: RunLoop.main)
+            .sink { [weak self] hideFromRecording in
+                self?.updateScreenRecordingVisibility(hideFromRecording)
+            }
+            .store(in: &cancellables)
+        
+        // Set initial screen recording visibility
+        updateScreenRecordingVisibility(viewModel.hideFromScreenRecording)
     }
 
     func show() {
@@ -107,5 +117,14 @@ final class PrompterWindow {
         let heightOfBorderTopWithRadiusToHide: CGFloat = 4
         let y = screen.frame.maxY - height + heightOfBorderTopWithRadiusToHide// slight offset to hide border under notch
         return CGRect(x: x, y: y, width: width, height: height)
+    }
+    
+    private func updateScreenRecordingVisibility(_ hideFromRecording: Bool) {
+        // https://developer.apple.com/documentation/appkit/nswindow/sharingtype-swift.property
+        if hideFromRecording {
+            window.sharingType = .none
+        } else {
+            window.sharingType = .readOnly
+        }
     }
 }

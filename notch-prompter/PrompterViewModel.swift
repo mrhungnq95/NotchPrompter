@@ -52,6 +52,7 @@ final class PrompterViewModel: ObservableObject {
     @Published var topFadeHeight: Double = 40.0
     @Published var bottomFadeHeight: Double = 40.0
     @Published var showHoverControls: Bool = true
+    @Published var hideFromScreenRecording: Bool = false
     
     var backScrollAmount: Double = 20.0 // pixels to scroll back
     
@@ -86,6 +87,8 @@ final class PrompterViewModel: ObservableObject {
         static let topFadeHeight = "TopFadeHeight"
         static let bottomFadeHeight = "BottomFadeHeight"
         static let showHoverControls = "ShowHoverControls"
+        static let hideFromScreenRecording = "HideFromScreenRecording"
+
     }
     
     // MARK: Init
@@ -234,6 +237,7 @@ final class PrompterViewModel: ObservableObject {
         $topFadeHeight.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $bottomFadeHeight.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $showHoverControls.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
+        $hideFromScreenRecording.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
     }
     
     private func loadSettings() {
@@ -272,6 +276,7 @@ final class PrompterViewModel: ObservableObject {
         bottomFadeHeight = defaults.double(forKey: Keys.bottomFadeHeight)
         if bottomFadeHeight == 0 { bottomFadeHeight = 40.0 }
         showHoverControls = defaults.object(forKey: Keys.showHoverControls) as? Bool ?? true
+        hideFromScreenRecording = defaults.object(forKey: Keys.hideFromScreenRecording) as? Bool ?? false
     }
     
     private func saveSettings() {
@@ -294,6 +299,7 @@ final class PrompterViewModel: ObservableObject {
         defaults.set(topFadeHeight, forKey: Keys.topFadeHeight)
         defaults.set(bottomFadeHeight, forKey: Keys.bottomFadeHeight)
         defaults.set(showHoverControls, forKey: Keys.showHoverControls)
+        defaults.set(hideFromScreenRecording, forKey: Keys.hideFromScreenRecording)
     }
     
     // MARK: Connector for display refresh

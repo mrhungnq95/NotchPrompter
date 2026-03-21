@@ -331,6 +331,13 @@ struct SettingsTabView: View {
                     step: 10,
                     unit: "px"
                 )
+                
+                Toggle("Hide from screen recording", isOn: $viewModel.hideFromScreenRecording)
+                
+                Text("Tip: When enabled, the prompter window will be hidden from screen recordings and screenshots. Useful for presentations and recordings where you don't want the prompter to be visible.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 4)
 
                 Spacer(minLength: 12)
                 
