@@ -132,6 +132,15 @@ struct SettingsTabView: View {
                     unit: "pt"
                 )
                 
+                SettingSlider(
+                    label: "Window opacity",
+                    value: $viewModel.opacity,
+                    range: 0.1...1.0,
+                    step: 0.05,
+                    unit: "%",
+                    isPercentage: true
+                )
+                
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Font style")
                         .font(.subheadline)
@@ -161,6 +170,13 @@ struct SettingsTabView: View {
                 )
 
                 Toggle("Pause prompter on mouse hover", isOn: $viewModel.pauseOnHover)
+                
+                Text("Tip: When hovering over the prompter with pause enabled, you can use your mouse wheel or trackpad to manually scroll up and down through the text.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 4)
+                    .padding(.bottom, 8)
+                
                 Toggle("Voice activation", isOn: $viewModel.voiceActivation)
                 
                 Divider()
@@ -286,6 +302,7 @@ struct SettingSlider: View {
     let range: ClosedRange<Double>
     let step: Double
     let unit: String
+    var isPercentage: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -296,8 +313,12 @@ struct SettingSlider: View {
             HStack {
                 Slider(value: $value, in: range, step: step)
 
-                if unit == "%" {
+                if unit == "%" && !isPercentage {
                     Text("\(Int(value * 1000))%")
+                        .monospacedDigit()
+                        .frame(width: 70, alignment: .trailing)
+                } else if isPercentage {
+                    Text("\(Int(value * 100))%")
                         .monospacedDigit()
                         .frame(width: 70, alignment: .trailing)
                 } else {

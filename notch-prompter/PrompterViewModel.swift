@@ -45,6 +45,7 @@ final class PrompterViewModel: ObservableObject {
     @Published var isPrompterVisible: Bool = true
     @Published var fontDesign: Font.Design = .default
     @Published var selectedScreenIndex: Int = 0
+    @Published var opacity: Double = 1.0
     
     
     private var timerCancellable: AnyCancellable?
@@ -70,6 +71,7 @@ final class PrompterViewModel: ObservableObject {
         static let isPrompterVisible = "IsPrompterVisible"
         static let fontDesign = "FontDesign"
         static let selectedScreenIndex = "SelectedScreenIndex"
+        static let opacity = "PrompterOpacity"
     }
     
     // MARK: Init
@@ -207,6 +209,7 @@ final class PrompterViewModel: ObservableObject {
         $isPrompterVisible.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $fontDesign.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $selectedScreenIndex.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
+        $opacity.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
     }
     
     private func loadSettings() {
@@ -232,6 +235,9 @@ final class PrompterViewModel: ObservableObject {
         }
         
         selectedScreenIndex = defaults.integer(forKey: Keys.selectedScreenIndex)
+        
+        opacity = defaults.double(forKey: Keys.opacity)
+        if opacity == 0 { opacity = 1.0 }
     }
     
     private func saveSettings() {
@@ -247,6 +253,7 @@ final class PrompterViewModel: ObservableObject {
         defaults.set(isPrompterVisible, forKey: Keys.isPrompterVisible)
         defaults.set(fontDesign.rawValue, forKey: Keys.fontDesign)
         defaults.set(selectedScreenIndex, forKey: Keys.selectedScreenIndex)
+        defaults.set(opacity, forKey: Keys.opacity)
     }
     
     // MARK: Connector for display refresh
