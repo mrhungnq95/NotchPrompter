@@ -10,6 +10,8 @@ struct PrompterView: View {
     @State private var wasPlayingBeforeHover: Bool = false
     @State private var isHovering: Bool = false
 
+    @Environment(\.colorScheme) var colorScheme
+
     var body: some View {
         ScrollablePrompterView(
             viewModel: viewModel,
@@ -20,7 +22,7 @@ struct PrompterView: View {
     }
 }
 
-// MARK: - Scrollable Prompter View with NSView for scroll events
+// MARK: Scrollable Prompter View with NSView for scroll events
 struct ScrollablePrompterView: NSViewRepresentable {
     @ObservedObject var viewModel: PrompterViewModel
     @Binding var contentHeight: CGFloat
@@ -160,6 +162,7 @@ struct PrompterContentView: View {
     @ObservedObject var viewModel: PrompterViewModel
     @Binding var contentHeight: CGFloat
     @State private var showControls = false
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         ZStack {
@@ -323,11 +326,10 @@ struct PrompterContentView: View {
 
     private var textBlock: some View {
         let base = viewModel.text.isEmpty ? "Put some text in Settings..." : viewModel.text
-        let text = "\n" + base + "\n\n🏁\n\n" // add a new line to not hide the first line under the notch
-        
+        let text = "\n" + base + "\n\n🏁\n\n"
         return Text(text)
             .font(.system(size: viewModel.fontSize, weight: .regular, design: viewModel.fontDesign))
-            .foregroundColor(.white)
+            .foregroundColor(colorScheme == .dark ? .white : .black)
             .multilineTextAlignment(.center)
             .lineSpacing(viewModel.lineHeight)
             .lineLimit(nil)
