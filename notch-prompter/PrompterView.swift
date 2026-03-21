@@ -184,6 +184,31 @@ struct PrompterContentView: View {
                     viewModel.offset = 0
                 }
             }
+            
+            // Fade overlays
+            VStack(spacing: 0) {
+                if viewModel.enableTopFade {
+                    LinearGradient(
+                        gradient: Gradient(colors: [.black, .clear]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: viewModel.topFadeHeight)
+                    .allowsHitTesting(false)
+                }
+                
+                Spacer()
+                
+                if viewModel.enableBottomFade {
+                    LinearGradient(
+                        gradient: Gradient(colors: [.clear, .black]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: viewModel.bottomFadeHeight)
+                    .allowsHitTesting(false)
+                }
+            }
         }
         .opacity(viewModel.opacity)
         .ignoresSafeArea()

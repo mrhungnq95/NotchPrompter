@@ -46,6 +46,10 @@ final class PrompterViewModel: ObservableObject {
     @Published var fontDesign: Font.Design = .default
     @Published var selectedScreenIndex: Int = 0
     @Published var opacity: Double = 1.0
+    @Published var enableTopFade: Bool = true
+    @Published var enableBottomFade: Bool = true
+    @Published var topFadeHeight: Double = 40.0
+    @Published var bottomFadeHeight: Double = 40.0
     
     
     private var timerCancellable: AnyCancellable?
@@ -72,6 +76,10 @@ final class PrompterViewModel: ObservableObject {
         static let fontDesign = "FontDesign"
         static let selectedScreenIndex = "SelectedScreenIndex"
         static let opacity = "PrompterOpacity"
+        static let enableTopFade = "EnableTopFade"
+        static let enableBottomFade = "EnableBottomFade"
+        static let topFadeHeight = "TopFadeHeight"
+        static let bottomFadeHeight = "BottomFadeHeight"
     }
     
     // MARK: Init
@@ -210,6 +218,10 @@ final class PrompterViewModel: ObservableObject {
         $fontDesign.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $selectedScreenIndex.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $opacity.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
+        $enableTopFade.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
+        $enableBottomFade.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
+        $topFadeHeight.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
+        $bottomFadeHeight.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
     }
     
     private func loadSettings() {
@@ -238,6 +250,13 @@ final class PrompterViewModel: ObservableObject {
         
         opacity = defaults.double(forKey: Keys.opacity)
         if opacity == 0 { opacity = 1.0 }
+        
+        enableTopFade = defaults.object(forKey: Keys.enableTopFade) as? Bool ?? true
+        enableBottomFade = defaults.object(forKey: Keys.enableBottomFade) as? Bool ?? true
+        topFadeHeight = defaults.double(forKey: Keys.topFadeHeight)
+        if topFadeHeight == 0 { topFadeHeight = 40.0 }
+        bottomFadeHeight = defaults.double(forKey: Keys.bottomFadeHeight)
+        if bottomFadeHeight == 0 { bottomFadeHeight = 40.0 }
     }
     
     private func saveSettings() {
@@ -254,6 +273,10 @@ final class PrompterViewModel: ObservableObject {
         defaults.set(fontDesign.rawValue, forKey: Keys.fontDesign)
         defaults.set(selectedScreenIndex, forKey: Keys.selectedScreenIndex)
         defaults.set(opacity, forKey: Keys.opacity)
+        defaults.set(enableTopFade, forKey: Keys.enableTopFade)
+        defaults.set(enableBottomFade, forKey: Keys.enableBottomFade)
+        defaults.set(topFadeHeight, forKey: Keys.topFadeHeight)
+        defaults.set(bottomFadeHeight, forKey: Keys.bottomFadeHeight)
     }
     
     // MARK: Connector for display refresh

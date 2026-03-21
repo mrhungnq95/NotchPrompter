@@ -157,6 +157,42 @@ struct SettingsTabView: View {
                 .padding(.vertical, 2)
                 
                 Divider()
+                
+                // MARK: - Fade Effects Section
+                SectionHeader("Fade Effects")
+                
+                Toggle("Enable top fade", isOn: $viewModel.enableTopFade)
+                
+                if viewModel.enableTopFade {
+                    SettingSlider(
+                        label: "Top fade height",
+                        value: $viewModel.topFadeHeight,
+                        range: 10...150,
+                        step: 5,
+                        unit: "px"
+                    )
+                    .padding(.leading, 20)
+                }
+                
+                Toggle("Enable bottom fade", isOn: $viewModel.enableBottomFade)
+                
+                if viewModel.enableBottomFade {
+                    SettingSlider(
+                        label: "Bottom fade height",
+                        value: $viewModel.bottomFadeHeight,
+                        range: 10...150,
+                        step: 5,
+                        unit: "px"
+                    )
+                    .padding(.leading, 20)
+                }
+                
+                Text("Tip: Fade effects create a smooth gradient overlay at the top and/or bottom of the prompter for a more polished, professional appearance.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 4)
+                
+                Divider()
 
                 // MARK: - Behavior Section
                 SectionHeader("Behavior")
