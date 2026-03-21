@@ -10,8 +10,6 @@ struct PrompterView: View {
     @State private var wasPlayingBeforeHover: Bool = false
     @State private var isHovering: Bool = false
 
-    @Environment(\.colorScheme) var colorScheme
-
     var body: some View {
         ScrollablePrompterView(
             viewModel: viewModel,
@@ -162,11 +160,10 @@ struct PrompterContentView: View {
     @ObservedObject var viewModel: PrompterViewModel
     @Binding var contentHeight: CGFloat
     @State private var showControls = false
-    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         ZStack {
-            Color.black
+            viewModel.prompterTheme.backgroundColor
             GeometryReader { geo in
                 VStack(spacing: 0) {
                     Spacer(minLength: 0)
@@ -193,7 +190,7 @@ struct PrompterContentView: View {
             VStack(spacing: 0) {
                 if viewModel.enableTopFade {
                     LinearGradient(
-                        gradient: Gradient(colors: [.black, .clear]),
+                        gradient: Gradient(colors: [viewModel.prompterTheme.fadeColor, .clear]),
                         startPoint: .top,
                         endPoint: .bottom
                     )
@@ -205,7 +202,7 @@ struct PrompterContentView: View {
                 
                 if viewModel.enableBottomFade {
                     LinearGradient(
-                        gradient: Gradient(colors: [.clear, .black]),
+                        gradient: Gradient(colors: [.clear, viewModel.prompterTheme.fadeColor]),
                         startPoint: .top,
                         endPoint: .bottom
                     )
@@ -274,7 +271,7 @@ struct PrompterContentView: View {
                 .animation(.easeInOut(duration: 0.2), value: showControls)
             }
         }
-        .opacity(viewModel.opacity)
+//        .opacity(viewModel.opacity)
         .ignoresSafeArea()
         .onHover { hovering in
             withAnimation {
@@ -329,7 +326,7 @@ struct PrompterContentView: View {
         let text = "\n" + base + "\n\n🏁\n\n"
         return Text(text)
             .font(.system(size: viewModel.fontSize, weight: .regular, design: viewModel.fontDesign))
-            .foregroundColor(colorScheme == .dark ? .white : .black)
+            .foregroundColor(viewModel.prompterTheme.textColor)
             .multilineTextAlignment(.center)
             .lineSpacing(viewModel.lineHeight)
             .lineLimit(nil)

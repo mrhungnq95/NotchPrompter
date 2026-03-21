@@ -42,17 +42,17 @@ final class PrompterViewModel: ObservableObject {
     @Published var prompterWidth: CGFloat = 184
     @Published var prompterHeight: CGFloat = 150
     @Published var voiceActivation: Bool = false
-    @Published var autoGain: Bool = true
+    @Published var autoGain: Bool = false
     @Published var isPrompterVisible: Bool = true
     @Published var fontDesign: Font.Design = .monospaced
     @Published var selectedScreenIndex: Int = 0
-    @Published var opacity: Double = 1.0
     @Published var enableTopFade: Bool = true
     @Published var enableBottomFade: Bool = true
     @Published var topFadeHeight: Double = 40.0
     @Published var bottomFadeHeight: Double = 40.0
     @Published var showHoverControls: Bool = true
     @Published var hideFromScreenRecording: Bool = false
+    @Published var prompterTheme: PrompterTheme = .dark
     
     var backScrollAmount: Double = 20.0 // pixels to scroll back
     
@@ -88,6 +88,7 @@ final class PrompterViewModel: ObservableObject {
         static let bottomFadeHeight = "BottomFadeHeight"
         static let showHoverControls = "ShowHoverControls"
         static let hideFromScreenRecording = "HideFromScreenRecording"
+        static let prompterTheme = "PrompterTheme"
 
     }
     
@@ -231,13 +232,13 @@ final class PrompterViewModel: ObservableObject {
         $isPrompterVisible.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $fontDesign.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $selectedScreenIndex.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
-        $opacity.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $enableTopFade.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $enableBottomFade.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $topFadeHeight.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $bottomFadeHeight.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $showHoverControls.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $hideFromScreenRecording.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
+        $prompterTheme.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
     }
     
     private func loadSettings() {
@@ -266,9 +267,6 @@ final class PrompterViewModel: ObservableObject {
         
         selectedScreenIndex = defaults.integer(forKey: Keys.selectedScreenIndex)
         
-        opacity = defaults.double(forKey: Keys.opacity)
-        if opacity == 0 { opacity = 1.0 }
-        
         enableTopFade = defaults.object(forKey: Keys.enableTopFade) as? Bool ?? true
         enableBottomFade = defaults.object(forKey: Keys.enableBottomFade) as? Bool ?? true
         topFadeHeight = defaults.double(forKey: Keys.topFadeHeight)
@@ -277,6 +275,10 @@ final class PrompterViewModel: ObservableObject {
         if bottomFadeHeight == 0 { bottomFadeHeight = 40.0 }
         showHoverControls = defaults.object(forKey: Keys.showHoverControls) as? Bool ?? true
         hideFromScreenRecording = defaults.object(forKey: Keys.hideFromScreenRecording) as? Bool ?? false
+        
+        if let themeRaw = defaults.string(forKey: Keys.prompterTheme) {
+            prompterTheme = PrompterTheme(rawValue: themeRaw) ?? .dark
+        }
     }
     
     private func saveSettings() {
@@ -293,13 +295,13 @@ final class PrompterViewModel: ObservableObject {
         defaults.set(isPrompterVisible, forKey: Keys.isPrompterVisible)
         defaults.set(fontDesign.rawValue, forKey: Keys.fontDesign)
         defaults.set(selectedScreenIndex, forKey: Keys.selectedScreenIndex)
-        defaults.set(opacity, forKey: Keys.opacity)
         defaults.set(enableTopFade, forKey: Keys.enableTopFade)
         defaults.set(enableBottomFade, forKey: Keys.enableBottomFade)
         defaults.set(topFadeHeight, forKey: Keys.topFadeHeight)
         defaults.set(bottomFadeHeight, forKey: Keys.bottomFadeHeight)
         defaults.set(showHoverControls, forKey: Keys.showHoverControls)
         defaults.set(hideFromScreenRecording, forKey: Keys.hideFromScreenRecording)
+        defaults.set(prompterTheme.rawValue, forKey: Keys.prompterTheme)
     }
     
     // MARK: Connector for display refresh
@@ -397,6 +399,40 @@ extension Font.Design: RawRepresentable {
         case .rounded: return "Rounded"
         case .monospaced: return "Monospaced"
         @unknown default: return "Default"
+        }
+    }
+}
+
+// MARK: - PrompterTheme Enum
+enum PrompterTheme: String, CaseIterable {
+    case dark = "dark"
+    case light = "light"
+    
+    var displayName: String {
+        switch self {
+        case .dark: return "Dark"
+        case .light: return "Light"
+        }
+    }
+    
+    var backgroundColor: Color {
+        switch self {
+        case .dark: return .black
+        case .light: return .white
+        }
+    }
+    
+    var textColor: Color {
+        switch self {
+        case .dark: return .white
+        case .light: return .black
+        }
+    }
+    
+    var fadeColor: Color {
+        switch self {
+        case .dark: return .black
+        case .light: return .white
         }
     }
 }

@@ -158,16 +158,7 @@ struct SettingsTabView: View {
                     step: 1,
                     unit: "pt"
                 )
-                
-                SettingSlider(
-                    label: "Window opacity",
-                    value: $viewModel.opacity,
-                    range: 0.1...1.0,
-                    step: 0.05,
-                    unit: "%",
-                    isPercentage: true
-                )
-                
+
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Font style")
                         .font(.subheadline)
@@ -179,6 +170,20 @@ struct SettingsTabView: View {
                         Text("Serif").tag(Font.Design.serif)
                         Text("Rounded").tag(Font.Design.rounded)
                         Text("Monospaced").tag(Font.Design.monospaced)
+                    }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                }
+                .padding(.vertical, 2)
+                
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Theme")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    
+                    Picker("", selection: $viewModel.prompterTheme) {
+                        Text("Dark").tag(PrompterTheme.dark)
+                        Text("Light").tag(PrompterTheme.light)
                     }
                     .pickerStyle(.menu)
                     .labelsHidden()
