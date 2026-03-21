@@ -37,6 +37,7 @@ final class PrompterViewModel: ObservableObject {
     @Published var offset: CGFloat = 0
     @Published var speed: Double = 12.0
     @Published var fontSize: Double = 10.0
+    @Published var lineHeight: Double = 8.0
     @Published var pauseOnHover: Bool = true
     @Published var prompterWidth: CGFloat = 184
     @Published var prompterHeight: CGFloat = 150
@@ -70,6 +71,7 @@ final class PrompterViewModel: ObservableObject {
         static let text = "PrompterText"
         static let speed = "PrompterSpeed"
         static let fontSize = "PrompterFontSize"
+        static let lineHeight = "PrompterLineHeight"
         static let pauseOnHover = "PrompterPauseOnHover"
         static let prompterWidth = "PrompterWidth"
         static let prompterHeight = "PrompterHeight"
@@ -217,6 +219,7 @@ final class PrompterViewModel: ObservableObject {
         $text.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $speed.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $fontSize.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
+        $lineHeight.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $pauseOnHover.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $prompterWidth.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $prompterHeight.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
@@ -241,6 +244,8 @@ final class PrompterViewModel: ObservableObject {
         if speed == 0 { speed = 12.0 }
         fontSize = defaults.double(forKey: Keys.fontSize)
         if fontSize == 0 { fontSize = 12.0 }
+        lineHeight = defaults.double(forKey: Keys.lineHeight)
+        if lineHeight == 0 { lineHeight = 8.0 }
         pauseOnHover = defaults.object(forKey: Keys.pauseOnHover) as? Bool ?? true
         prompterWidth = CGFloat(defaults.double(forKey: Keys.prompterWidth))
         if prompterWidth == 0 { prompterWidth = 184 }
@@ -274,6 +279,7 @@ final class PrompterViewModel: ObservableObject {
         defaults.set(text, forKey: Keys.text)
         defaults.set(speed, forKey: Keys.speed)
         defaults.set(fontSize, forKey: Keys.fontSize)
+        defaults.set(lineHeight, forKey: Keys.lineHeight)
         defaults.set(pauseOnHover, forKey: Keys.pauseOnHover)
         defaults.set(Double(prompterWidth), forKey: Keys.prompterWidth)
         defaults.set(Double(prompterHeight), forKey: Keys.prompterHeight)

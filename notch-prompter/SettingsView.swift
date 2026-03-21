@@ -152,6 +152,14 @@ struct SettingsTabView: View {
                 )
                 
                 SettingSlider(
+                    label: "Line height",
+                    value: $viewModel.lineHeight,
+                    range: 0...20,
+                    step: 1,
+                    unit: "pt"
+                )
+                
+                SettingSlider(
                     label: "Window opacity",
                     value: $viewModel.opacity,
                     range: 0.1...1.0,

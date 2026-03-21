@@ -313,8 +313,7 @@ struct PrompterContentView: View {
     
     private var movingText: some View {
         // Duplicate the text once to create a seamless loop
-        let linesSpacing = 8.0 //add settings to configure this
-        return VStack(spacing: linesSpacing) {
+        return VStack(spacing: viewModel.lineHeight) {
             textBlock
             textBlock
         }
@@ -330,7 +329,7 @@ struct PrompterContentView: View {
             .font(.system(size: viewModel.fontSize, weight: .regular, design: viewModel.fontDesign))
             .foregroundColor(.white)
             .multilineTextAlignment(.center)
-            .lineSpacing(8)
+            .lineSpacing(viewModel.lineHeight)
             .lineLimit(nil)
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .center)
