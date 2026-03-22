@@ -85,8 +85,8 @@ struct MenuContent: View {
             }
         }
 
-        Button("Donate") {
-            if let url = URL(string: "https://github.com/sponsors/jpomykala") {
+        Button("Sponsor the project") {
+            if let url = URL(string: "https://jpomykala.gumroad.com/l/notchprompter") {
                 NSWorkspace.shared.open(url)
             }
         }
