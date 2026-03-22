@@ -11,7 +11,7 @@ Perfect for quick videos, or keeping important text visible while you work.
 
 [Sponsor the project on Gumroad](https://jpomykala.gumroad.com/l/notchprompter)
 
-[![App Store licensing](https://img.shields.io/badge/App_Store_Fund-$15_/_$99-blue)]([https://github.com/sponsors/jpomykala](https://jpomykala.gumroad.com/l/notchprompter))
+[![AppStore licensing funds](https://img.shields.io/badge/AppStore_licensing_funds-$15_/_$99-blue)]([https://github.com/sponsors/jpomykala](https://jpomykala.gumroad.com/l/notchprompter))
 
 
 ## Features
@@ -31,15 +31,6 @@ Perfect for quick videos, or keeping important text visible while you work.
 ## How to install?
 
 Head to [Releases](https://github.com/jpomykala/NotchPrompter/releases) and download zip file for the latest version. Unzip it and move **notch-prompter.app** to your **Applications** folder.
-
-### First launch
-
-On the first launch, macOS may display a warning that the app is 'not safe' or from an 'unidentified developer.' This occurs because the app is not yet notarized, which requires a paid Apple Developer Program membership. To open the app, go to **System Settings -> Privacy & Security**, scroll down to the 'Security' section, and click 'Open Anyway.'
-
-Second option is to use terminal command:
-```
-xattr -rd com.apple.quarantine /Applications/notch-prompter.app
-```
 
 [Help me fund the Apple License](https://jpomykala.gumroad.com/l/notchprompter) to publish the app in AppStore for easy updates. 😬
 
