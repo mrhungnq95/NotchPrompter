@@ -78,7 +78,6 @@ final class PrompterViewModel: ObservableObject {
         static let prompterHeight = "PrompterHeight"
         static let voiceActivation = "VoiceActivation"
         static let audioThreshold = "AudioThreshold"
-        static let isPrompterVisible = "IsPrompterVisible"
         static let fontDesign = "FontDesign"
         static let selectedScreenIndex = "SelectedScreenIndex"
         static let opacity = "PrompterOpacity"
@@ -229,7 +228,6 @@ final class PrompterViewModel: ObservableObject {
         $prompterHeight.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $voiceActivation.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $audioThreshold.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
-        $isPrompterVisible.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $fontDesign.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $selectedScreenIndex.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $enableTopFade.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
@@ -259,7 +257,6 @@ final class PrompterViewModel: ObservableObject {
         voiceActivation = defaults.object(forKey: Keys.voiceActivation) as? Bool ?? false
         let threshold = defaults.double(forKey: Keys.audioThreshold)
         audioThreshold = threshold == 0 ? 0.01 : Float(threshold)
-        isPrompterVisible = defaults.object(forKey: Keys.isPrompterVisible) as? Bool ?? true
         
         if let fontDesignRaw = defaults.string(forKey: Keys.fontDesign) {
             fontDesign = Font.Design(rawValue: fontDesignRaw) ?? .default
@@ -292,7 +289,6 @@ final class PrompterViewModel: ObservableObject {
         defaults.set(Double(prompterHeight), forKey: Keys.prompterHeight)
         defaults.set(voiceActivation, forKey: Keys.voiceActivation)
         defaults.set(Double(audioThreshold), forKey: Keys.audioThreshold)
-        defaults.set(isPrompterVisible, forKey: Keys.isPrompterVisible)
         defaults.set(fontDesign.rawValue, forKey: Keys.fontDesign)
         defaults.set(selectedScreenIndex, forKey: Keys.selectedScreenIndex)
         defaults.set(enableTopFade, forKey: Keys.enableTopFade)

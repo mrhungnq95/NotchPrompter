@@ -25,14 +25,48 @@ struct SettingsView: View {
     @ObservedObject var viewModel: PrompterViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var selectedTab: SettingsTab = .script
+    @State private var contentVisible = false
+    @State private var isClosing = false
+    @State private var showResetConfirmation = false
 
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
-        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
-        return "\(version) (build: \(build))"
+//        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—" // I think this is too much for now
+        return "\(version)"
     }
 
     var body: some View {
+        ZStack {
+            if contentVisible {
+                settingsContent
+                    .transition(.opacity.combined(with: .scale(scale: 0.96)))
+            }
+        }
+        .frame(width: 680)
+        .frame(minHeight: 560, maxHeight: 760)
+        .background(.ultraThinMaterial)
+        .alert("Microphone access denied", isPresented: $viewModel.showMicrophoneAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Enable microphone access in System Settings → Privacy & Security → Microphone.")
+        }
+        .confirmationDialog("Reset Prompter Position?", isPresented: $showResetConfirmation, titleVisibility: .visible) {
+            Button("Reset", role: .destructive) {
+                viewModel.reset()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This will stop playback and reset the scroll position to the beginning.")
+        }
+        .onAppear {
+            // Animate in with spring animation
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.85).delay(0.05)) {
+                contentVisible = true
+            }
+        }
+    }
+    
+    private var settingsContent: some View {
         HStack(spacing: 0) {
             // Sidebar
             VStack(alignment: .leading, spacing: 2) {
@@ -65,6 +99,11 @@ struct SettingsView: View {
                 }
 
                 Spacer()
+                
+                Text("NotchPrompter \(appVersion)")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                    .opacity(0.6)
             }
             .padding(12)
             .frame(width: 160)
@@ -89,15 +128,11 @@ struct SettingsView: View {
                 }
 
                 Divider()
+                
+                
 
                 HStack {
-                    Text("NotchPrompter \(appVersion)")
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
-                        .opacity(0.3)
-                    
-                    Spacer()
-                    
+
                     Button {
                         if viewModel.isPlaying {
                             viewModel.pause()
@@ -112,11 +147,11 @@ struct SettingsView: View {
                                 .font(.system(size: 12, weight: .medium))
                         }
                     }
-                    .buttonStyle(.borderless)
+                    .buttonStyle(.automatic)
                     .disabled(viewModel.voiceActivation)
                     
                     Button {
-                        viewModel.reset()
+                        showResetConfirmation = true
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: "arrow.counterclockwise")
@@ -125,26 +160,43 @@ struct SettingsView: View {
                                 .font(.system(size: 12, weight: .medium))
                         }
                     }
-                    .buttonStyle(.borderless)
+                    .buttonStyle(.automatic)
+                    
+                    Button {
+                        viewModel.isPrompterVisible.toggle()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: viewModel.isPrompterVisible ? "eye.slash.fill" : "eye.fill")
+                                .font(.system(size: 10))
+                            Text(viewModel.isPrompterVisible ? "Hide" : "Show")
+                                .font(.system(size: 12, weight: .medium))
+                        }
+                    }
+                    .buttonStyle(.automatic)
+                    .help(viewModel.isPrompterVisible ? "Hide the prompter window" : "Show the prompter window")
 
+                    Spacer()
+                    
                     Button("Done") {
-                        dismiss()
+                        closeWithAnimation()
                     }
                     .keyboardShortcut(.defaultAction)
                     .buttonStyle(.borderedProminent)
                     .controlSize(.regular)
                 }
-                .padding(12)
+                .padding(.vertical, 12)
+                .padding(.horizontal, 16)
             }
             .frame(maxWidth: .infinity)
         }
-        .frame(width: 680)
-        .frame(minHeight: 560, maxHeight: 760)
-        .background(.ultraThinMaterial)
-        .alert("Microphone access denied", isPresented: $viewModel.showMicrophoneAlert) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text("Enable microphone access in System Settings → Privacy & Security → Microphone.")
+    }
+    
+    private func closeWithAnimation() {
+        withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
+            contentVisible = false
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            dismiss()
         }
     }
 }
