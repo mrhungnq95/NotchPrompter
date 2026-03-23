@@ -61,9 +61,9 @@ final class PrompterWindow {
             .receive(on: RunLoop.main)
             .sink { [weak self] isVisible in
                 if isVisible {
-                    self?.window.orderFront(nil)
+                    self?.animateShow()
                 } else {
-                    self?.window.orderOut(nil)
+                    self?.animateHide()
                 }
             }
             .store(in: &cancellables)
@@ -115,7 +115,8 @@ final class PrompterWindow {
     private func topCenterFrame(width: CGFloat, height: CGFloat, screen: NSScreen) -> CGRect {
         let x = screen.frame.midX - width / 2
         let heightOfBorderTopWithRadiusToHide: CGFloat = 4
-        let y = screen.frame.maxY - height + heightOfBorderTopWithRadiusToHide// slight offset to hide border under notch
+        let y = screen.frame.maxY - height + heightOfBorderTopWithRadiusToHide
+        // MARK: slight offset to hide border under notch, this probably causes the issue with moving the notch view to another display when another display is on bottom/top
         return CGRect(x: x, y: y, width: width, height: height)
     }
     
@@ -126,5 +127,43 @@ final class PrompterWindow {
         } else {
             window.sharingType = .readOnly
         }
+    }
+    
+    private let animationSpeed = 0.25
+    
+    private func animateShow() {
+        guard let screen = getSelectedScreen() else { return }
+        let finalFrame = topCenterFrame(width: viewModel.prompterWidth, height: viewModel.prompterHeight, screen: screen)
+
+        var startFrame = finalFrame
+        startFrame.origin.y = screen.frame.maxY
+        
+        window.setFrame(startFrame, display: false)
+        window.orderFront(nil)
+    
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = animationSpeed
+            context.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            window.animator().setFrame(finalFrame, display: true)
+        }
+    }
+    
+    private func animateHide() {
+        guard let screen = getSelectedScreen() else {
+            window.orderOut(nil)
+            return
+        }
+        
+        let currentFrame = window.frame
+        var targetFrame = currentFrame
+        targetFrame.origin.y = screen.frame.maxY
+        
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = animationSpeed
+            context.timingFunction = CAMediaTimingFunction(name: .easeIn)
+            window.animator().setFrame(targetFrame, display: true)
+        }, completionHandler: { [weak self] in
+            self?.window.orderOut(nil)
+        })
     }
 }
