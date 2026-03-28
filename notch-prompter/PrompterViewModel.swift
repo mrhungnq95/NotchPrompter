@@ -116,7 +116,7 @@ final class PrompterViewModel: ObservableObject {
         loadSettings()
         startTimer()
         observeSettingsChanges()
-        setupKeyboardShortcuts()
+//        setupKeyboardShortcuts()
         $voiceActivation
             .removeDuplicates()
             .sink { [weak self] enabled in
@@ -134,8 +134,10 @@ final class PrompterViewModel: ObservableObject {
             .sink { [weak self] enabled in
                 guard let self = self else { return }
                 if enabled {
+                    print("Global shortcuts enabled")
                     self.registerGlobalKeyboardShortcuts()
                 } else {
+                    print("Global shortcuts disabled")
                     self.unregisterGlobalKeyboardShortcuts()
                 }
             }
@@ -241,6 +243,8 @@ final class PrompterViewModel: ObservableObject {
     }
     
     private func registerGlobalKeyboardShortcuts() {
+        
+        print("Register hotkeys")
         // Control + Option + P: Play/Pause
         playPauseHotKey = HotKey(key: .p, modifiers: [.control, .option])
         playPauseHotKey?.keyDownHandler = { [weak self] in
@@ -286,6 +290,7 @@ final class PrompterViewModel: ObservableObject {
     }
     
     private func unregisterGlobalKeyboardShortcuts() {
+        print("Unregister hotkeys")
         playPauseHotKey = nil
         showHideHotKey = nil
         increaseSpeedHotKey = nil

@@ -17,8 +17,18 @@ struct NotchPrompterApp: App {
                 })
         }
 
-        MenuBarExtra("NotchPrompter", systemImage: "text.justify") {
+        MenuBarExtra {
             MenuContent(viewModel: appDelegate.viewModel)
+        } label: {
+            let image: NSImage = {
+                let ratio = $0.size.height / $0.size.width
+                $0.size.height = 18
+                $0.size.width = 18 / ratio
+                return $0
+            }(NSImage(named: "MenuBarIcon")!)
+
+            Image(nsImage: image)
+                .renderingMode(.template)
         }
         .menuBarExtraStyle(.menu)
     }
@@ -87,13 +97,19 @@ struct MenuContent: View {
                 NSWorkspace.shared.open(url)
             }
         }
-    
-
+        
+//        Button("Help translate") {
+//            if let url = URL(string: "https://simplelocalize.io/suggestions/?id=f1f11f9305dc44a2872b6a154dea6edc") {
+//                NSWorkspace.shared.open(url)
+//            }
+//        }
+//        #if !APP_STORE_VERSION
 //        Button("Sponsor the project") {
 //            if let url = URL(string: "https://jpomykala.gumroad.com/l/notchprompter") {
 //                NSWorkspace.shared.open(url)
 //            }
 //        }
+//        #endif
         
         Divider()
 

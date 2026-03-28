@@ -817,6 +817,7 @@ struct LayoutTabView: View {
     }
 }
 
+// TODO: add option to change shortcuts
 // MARK: - Keyboard Tab
 struct KeyboardTabView: View {
     @ObservedObject var viewModel: PrompterViewModel
@@ -833,7 +834,7 @@ struct KeyboardTabView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Enable global keyboard shortcuts")
                             .font(.system(size: 13, weight: .medium))
-                        Text("Control the prompter from any application")
+                        Text("Control the prompter without having to focus on it")
                             .font(.system(size: 11))
                             .foregroundStyle(.secondary)
                     }
