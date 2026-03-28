@@ -3,7 +3,7 @@ import SwiftUI
 struct PrompterView: View {
     @ObservedObject var viewModel: PrompterViewModel
 
-    // Measure content height to loop or stop appropriately
+    // Measure content height to stop appropriately
     @State private var contentHeight: CGFloat = 0
 
     // Tracks whether we paused due to hover and what the previous play state was
@@ -212,6 +212,18 @@ struct PrompterContentView: View {
                 }
             }
             
+            // Progress bar on the right side
+            if viewModel.showProgressBar {
+                HStack {
+                    Spacer()
+                    ProgressBarView(
+                        currentOffset: viewModel.offset,
+                        totalHeight: contentHeight,
+                        theme: viewModel.prompterTheme
+                    )
+                }
+            }
+            
             // Hover controls overlay
             if showControls && viewModel.showHoverControls {
                 VStack {
@@ -368,6 +380,7 @@ struct PrompterContentView: View {
     }
 }
 
+// MARK: - Height reader
 private struct HeightReader: View {
     @Binding var height: CGFloat
     var body: some View {
@@ -380,3 +393,35 @@ private struct HeightReader: View {
         }
     }
 }
+
+
+// MARK: - Progress bar
+struct ProgressBarView: View {
+    let currentOffset: CGFloat
+    let totalHeight: CGFloat
+    let theme: PrompterTheme
+    
+    private var progress: Double {
+        guard totalHeight > 0 else { return 0 }
+        return min(max(Double(currentOffset / totalHeight), 0), 1.0)
+    }
+    
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .top) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(theme.textColor.opacity(0.15))
+                    .frame(width: 4)
+                RoundedRectangle(cornerRadius: 2) // Progres
+                    .fill(theme.textColor.opacity(0.6))
+                    .frame(width: 4, height: geo.size.height * progress)
+            }
+            .frame(maxHeight: .infinity)
+        }
+        .frame(width: 4)
+        .padding(.trailing, 8)
+        .padding(.vertical, 8)
+        .allowsHitTesting(false)
+    }
+}
+

@@ -32,7 +32,6 @@ struct SettingsView: View {
 
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
-//        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—" // I think this is too much for now
         return "\(version)"
     }
 
@@ -727,7 +726,7 @@ struct LayoutTabView: View {
                         get: { Double(viewModel.prompterHeight) },
                         set: { viewModel.prompterHeight = CGFloat($0) }
                     ),
-                    range: 20...500,
+                    range: 80...500,
                     step: 10,
                     unit: "px"
                 )
