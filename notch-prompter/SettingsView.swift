@@ -420,7 +420,7 @@ struct AppearanceTabView: View {
                 SettingSlider(
                     label: "Size",
                     value: $viewModel.fontSize,
-                    range: 8...30,
+                    range: 8...80,
                     step: 1,
                     unit: "pt"
                 )
@@ -563,7 +563,7 @@ struct BehaviorTabView: View {
                 SettingSlider(
                     label: "Scroll speed",
                     value: $viewModel.speed,
-                    range: 1...40,
+                    range: 1...100,
                     step: 1,
                     unit: "pt/s"
                 )
