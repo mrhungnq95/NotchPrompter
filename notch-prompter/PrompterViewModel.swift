@@ -4,6 +4,7 @@ import CoreVideo
 import AVFoundation
 import Accelerate
 import SwiftUI
+import HotKey
 
 final class PrompterViewModel: ObservableObject {
     
@@ -56,6 +57,9 @@ final class PrompterViewModel: ObservableObject {
     @Published var horizontalAlignment: PrompterHorizontalAlignment = .center
     @Published var textAlignment: PrompterTextAlignment = .center
     @Published var showProgressBar: Bool = true
+    @Published var enableGlobalKeyboardShortcuts: Bool = false
+    @Published var speedIncrement: Double = 2.0
+    @Published var manualScrollAmount: Double = 50.0
     
     var backScrollAmount: Double = 20.0 // pixels to scroll back
     
@@ -63,6 +67,14 @@ final class PrompterViewModel: ObservableObject {
     private var timerCancellable: AnyCancellable?
     private var lastTick: CFTimeInterval?
     private var cancellables: Set<AnyCancellable> = []
+    
+    // MARK: Global keyboard shortcuts
+    private var playPauseHotKey: HotKey?
+    private var showHideHotKey: HotKey?
+    private var increaseSpeedHotKey: HotKey?
+    private var decreaseSpeedHotKey: HotKey?
+    private var scrollUpHotKey: HotKey?
+    private var scrollDownHotKey: HotKey?
     
     var audioMonitor: AudioMonitor?
     @Published var showMicrophoneAlert: Bool = false
@@ -94,6 +106,9 @@ final class PrompterViewModel: ObservableObject {
         static let horizontalAlignment = "HorizontalAlignment"
         static let textAlignment = "TextAlignment"
         static let showProgressBar = "ShowProgressBar"
+        static let enableGlobalKeyboardShortcuts = "EnableGlobalKeyboardShortcuts"
+        static let speedIncrement = "SpeedIncrement"
+        static let manualScrollAmount = "ManualScrollAmount"
     }
     
     // MARK: Init
@@ -101,6 +116,7 @@ final class PrompterViewModel: ObservableObject {
         loadSettings()
         startTimer()
         observeSettingsChanges()
+        setupKeyboardShortcuts()
         $voiceActivation
             .removeDuplicates()
             .sink { [weak self] enabled in
@@ -109,6 +125,18 @@ final class PrompterViewModel: ObservableObject {
                     self.requestMicrophoneAccessAndStart()
                 } else {
                     self.audioMonitor?.stopMonitoring()
+                }
+            }
+            .store(in: &cancellables)
+        
+        $enableGlobalKeyboardShortcuts
+            .removeDuplicates()
+            .sink { [weak self] enabled in
+                guard let self = self else { return }
+                if enabled {
+                    self.registerGlobalKeyboardShortcuts()
+                } else {
+                    self.unregisterGlobalKeyboardShortcuts()
                 }
             }
             .store(in: &cancellables)
@@ -186,6 +214,86 @@ final class PrompterViewModel: ObservableObject {
         offset = max(0, offset - backScrollAmount)
     }
     
+    // MARK: Manual Scroll Control
+    func scrollUp() {
+        offset = max(0, offset - manualScrollAmount)
+    }
+    
+    func scrollDown() {
+        offset += manualScrollAmount
+    }
+    
+    // MARK: Speed Control
+    func increaseSpeed() {
+        speed = min(40, speed + speedIncrement)
+    }
+    
+    func decreaseSpeed() {
+        speed = max(1, speed - speedIncrement)
+    }
+    
+    // MARK: Keyboard Shortcuts Setup
+    private func setupKeyboardShortcuts() {
+        // Initial registration if enabled
+        if enableGlobalKeyboardShortcuts {
+            registerGlobalKeyboardShortcuts()
+        }
+    }
+    
+    private func registerGlobalKeyboardShortcuts() {
+        // Control + Option + P: Play/Pause
+        playPauseHotKey = HotKey(key: .p, modifiers: [.control, .option])
+        playPauseHotKey?.keyDownHandler = { [weak self] in
+            guard let self = self else { return }
+            if !self.voiceActivation {
+                if self.isPlaying {
+                    self.pause()
+                } else {
+                    self.play()
+                }
+            }
+        }
+        
+        // Control + Option + H: Show/Hide
+        showHideHotKey = HotKey(key: .h, modifiers: [.control, .option])
+        showHideHotKey?.keyDownHandler = { [weak self] in
+            self?.isPrompterVisible.toggle()
+        }
+        
+        // Control + Option + Right Arrow: Increase Speed
+        increaseSpeedHotKey = HotKey(key: .rightArrow, modifiers: [.control, .option])
+        increaseSpeedHotKey?.keyDownHandler = { [weak self] in
+            self?.increaseSpeed()
+        }
+        
+        // Control + Option + Left Arrow: Decrease Speed
+        decreaseSpeedHotKey = HotKey(key: .leftArrow, modifiers: [.control, .option])
+        decreaseSpeedHotKey?.keyDownHandler = { [weak self] in
+            self?.decreaseSpeed()
+        }
+        
+        // Control + Option + Up Arrow: Scroll Up
+        scrollUpHotKey = HotKey(key: .upArrow, modifiers: [.control, .option])
+        scrollUpHotKey?.keyDownHandler = { [weak self] in
+            self?.scrollUp()
+        }
+        
+        // Control + Option + Down Arrow: Scroll Down
+        scrollDownHotKey = HotKey(key: .downArrow, modifiers: [.control, .option])
+        scrollDownHotKey?.keyDownHandler = { [weak self] in
+            self?.scrollDown()
+        }
+    }
+    
+    private func unregisterGlobalKeyboardShortcuts() {
+        playPauseHotKey = nil
+        showHideHotKey = nil
+        increaseSpeedHotKey = nil
+        decreaseSpeedHotKey = nil
+        scrollUpHotKey = nil
+        scrollDownHotKey = nil
+    }
+    
     // MARK: Timer
     private func startTimer() {
         timerCancellable = CADisplayLinkPublisher()
@@ -231,6 +339,9 @@ final class PrompterViewModel: ObservableObject {
         $horizontalAlignment.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $textAlignment.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $showProgressBar.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
+        $enableGlobalKeyboardShortcuts.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
+        $speedIncrement.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
+        $manualScrollAmount.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
     }
     
     private func loadSettings() {
@@ -280,6 +391,12 @@ final class PrompterViewModel: ObservableObject {
         }
         
         showProgressBar = defaults.object(forKey: Keys.showProgressBar) as? Bool ?? true
+        
+        enableGlobalKeyboardShortcuts = defaults.object(forKey: Keys.enableGlobalKeyboardShortcuts) as? Bool ?? false
+        speedIncrement = defaults.double(forKey: Keys.speedIncrement)
+        if speedIncrement == 0 { speedIncrement = 2.0 }
+        manualScrollAmount = defaults.double(forKey: Keys.manualScrollAmount)
+        if manualScrollAmount == 0 { manualScrollAmount = 50.0 }
     }
     
     private func saveSettings() {
@@ -305,6 +422,9 @@ final class PrompterViewModel: ObservableObject {
         defaults.set(horizontalAlignment.rawValue, forKey: Keys.horizontalAlignment)
         defaults.set(textAlignment.rawValue, forKey: Keys.textAlignment)
         defaults.set(showProgressBar, forKey: Keys.showProgressBar)
+        defaults.set(enableGlobalKeyboardShortcuts, forKey: Keys.enableGlobalKeyboardShortcuts)
+        defaults.set(speedIncrement, forKey: Keys.speedIncrement)
+        defaults.set(manualScrollAmount, forKey: Keys.manualScrollAmount)
     }
     
     // MARK: Connector for display refresh

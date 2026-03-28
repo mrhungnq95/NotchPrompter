@@ -230,25 +230,34 @@ struct PrompterContentView: View {
                     Spacer()
                     
                     HStack(spacing: 8) {
-                        // Play/Pause button
-                        Button(action: {
-                            if viewModel.isPlaying {
-                                viewModel.pause()
-                            } else {
-                                viewModel.play()
+                        // Play
+                        if viewModel.voiceActivation {
+                            Button(action: {
+                                openSettingsWindow() // TODO: open voice settings
+                            }) {
+                                Image(systemName: "microphone.circle.fill")
+                                    .font(.system(size: 22))
+                                    .foregroundColor(.orange)
+                                    .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
                             }
-                        }) {
-                            Image(systemName: viewModel.isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                                .font(.system(size: 22))
-                                .foregroundColor(.white)
-                                .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
+                            .disabled(true)
+                            .buttonStyle(.plain)
+                        } else {
+                            Button(action: {
+                                if viewModel.isPlaying {
+                                    viewModel.pause()
+                                } else {
+                                    viewModel.play()
+                                }
+                            }) {
+                                Image(systemName: viewModel.isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                                    .font(.system(size: 22))
+                                    .foregroundColor(.white)
+                                    .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
-                        .disabled(viewModel.voiceActivation)
-                        .opacity(viewModel.voiceActivation ? 0.5 : 1.0)
-                        .help(viewModel.voiceActivation ? "Disabled during voice activation" : (viewModel.isPlaying ? "Pause" : "Play"))
-                        
-                        // Back button (scroll back)
+                        // SCroll back
                         Button(action: {
                             viewModel.scrollBack()
                         }) {
@@ -260,7 +269,7 @@ struct PrompterContentView: View {
                         .buttonStyle(.plain)
                         .help("Scroll back a few lines")
                         
-                        // Settings button
+                        // Settings
                         Button(action: {
                             openSettingsWindow()
                         }) {
@@ -296,7 +305,7 @@ struct PrompterContentView: View {
     private func openSettingsWindow() {
         // Activate the app
         NSApp.activate(ignoringOtherApps: true)
-        
+ 
         // Try to find existing settings window first
         for window in NSApp.windows {
             if window.title == "NotchPrompter" {
