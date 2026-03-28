@@ -584,7 +584,7 @@ struct BehaviorTabView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Show controls on hover")
                             .font(.system(size: 13))
-                        Text("Display play/pause controls when hovering")
+                        Text("Display controls when hovering")
                             .font(.system(size: 11))
                             .foregroundStyle(.secondary)
                     }

@@ -229,7 +229,7 @@ struct PrompterContentView: View {
                 VStack {
                     Spacer()
                     
-                    HStack(spacing: 16) {
+                    HStack(spacing: 8) {
                         // Play/Pause button
                         Button(action: {
                             if viewModel.isPlaying {
@@ -239,7 +239,7 @@ struct PrompterContentView: View {
                             }
                         }) {
                             Image(systemName: viewModel.isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                                .font(.system(size: 32))
+                                .font(.system(size: 22))
                                 .foregroundColor(.white)
                                 .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
                         }
@@ -253,7 +253,7 @@ struct PrompterContentView: View {
                             viewModel.scrollBack()
                         }) {
                             Image(systemName: "backward.circle.fill")
-                                .font(.system(size: 32))
+                                .font(.system(size: 22))
                                 .foregroundColor(.white)
                                 .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
                         }
@@ -265,20 +265,20 @@ struct PrompterContentView: View {
                             openSettingsWindow()
                         }) {
                             Image(systemName: "gearshape.circle.fill")
-                                .font(.system(size: 32))
+                                .font(.system(size: 22))
                                 .foregroundColor(.white)
                                 .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
                         }
                         .buttonStyle(.plain)
                         .help("Open Settings")
                     }
-                    .padding(16)
+                    .padding(6)
                     .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.black.opacity(0.75))
-                            .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.black.opacity(0.6))
+                            .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
                     )
-                    .padding(.bottom, 24)
+                    .padding(.bottom, 2)
                 }
                 .transition(.opacity.combined(with: .scale(scale: 0.95)))
                 .animation(.easeInOut(duration: 0.2), value: showControls)
@@ -417,7 +417,8 @@ struct ProgressBarView: View {
             .frame(maxHeight: .infinity)
         }
         .frame(width: 4)
-        .padding(.trailing, 8)
+        .padding(.trailing, 6)
+        .padding(.bottom, 8)
         .padding(.vertical, 8)
         .allowsHitTesting(false)
     }
