@@ -4,9 +4,10 @@ import SwiftUI
 enum SettingsTab: String, CaseIterable, Identifiable {
     case script = "Script"
     case appearance = "Appearance"
+    case layout = "Layout"
     case behavior = "Behavior"
     case voice = "Voice"
-    case layout = "Layout"
+
     
     var id: String { rawValue }
     
@@ -14,9 +15,9 @@ enum SettingsTab: String, CaseIterable, Identifiable {
         switch self {
         case .script: return "doc.text"
         case .appearance: return "paintpalette"
+        case .layout: return "macwindow"
         case .behavior: return "gearshape"
         case .voice: return "waveform"
-        case .layout: return "macwindow"
         }
     }
 }
@@ -365,7 +366,7 @@ struct AppearanceTabView: View {
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Font")
+                Text("Script")
                     .font(.system(size: 13, weight: .medium))
                 
                 VStack(alignment: .leading, spacing: 6) {
@@ -373,13 +374,44 @@ struct AppearanceTabView: View {
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                     
-                    Picker("", selection: $viewModel.fontDesign) {
+                    HStack(spacing: 8) {
                         ForEach([Font.Design.default, .serif, .rounded, .monospaced], id: \.self) { design in
-                            Text(design.displayName).tag(design)
+                            Button {
+                                viewModel.fontDesign = design
+                            } label: {
+                                VStack(spacing: 4) {
+                                    Text(design.icon)
+                                        .font(design.previewFont)
+                                    Text(design.displayName)
+                                        .font(.system(size: 11))
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(
+                                    viewModel.fontDesign == design 
+                                        ? Color.accentColor.opacity(0.15) 
+                                        : Color.clear
+                                )
+                                .foregroundStyle(
+                                    viewModel.fontDesign == design 
+                                        ? Color.accentColor 
+                                        : .primary
+                                )
+                                .contentShape(Rectangle())
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .strokeBorder(
+                                            viewModel.fontDesign == design 
+                                                ? Color.accentColor 
+                                                : Color.primary.opacity(0.2),
+                                            lineWidth: 1
+                                        )
+                                )
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
                 }
                 
                 SettingSlider(
@@ -399,7 +431,7 @@ struct AppearanceTabView: View {
                 )
                 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Text alignment")
+                    Text("Alignment")
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                     
@@ -554,6 +586,17 @@ struct BehaviorTabView: View {
                         Text("Show controls on hover")
                             .font(.system(size: 13))
                         Text("Display play/pause controls when hovering")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .toggleStyle(.checkbox)
+                
+                Toggle(isOn: $viewModel.showProgressBar) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Show progress bar")
+                            .font(.system(size: 13))
+                        Text("Display a vertical progress indicator on the right side")
                             .font(.system(size: 11))
                             .foregroundStyle(.secondary)
                     }

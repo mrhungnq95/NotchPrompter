@@ -55,6 +55,7 @@ final class PrompterViewModel: ObservableObject {
     @Published var prompterTheme: PrompterTheme = .dark
     @Published var horizontalAlignment: PrompterHorizontalAlignment = .center
     @Published var textAlignment: PrompterTextAlignment = .center
+    @Published var showProgressBar: Bool = true
     
     var backScrollAmount: Double = 20.0 // pixels to scroll back
     
@@ -92,6 +93,7 @@ final class PrompterViewModel: ObservableObject {
         static let prompterTheme = "PrompterTheme"
         static let horizontalAlignment = "HorizontalAlignment"
         static let textAlignment = "TextAlignment"
+        static let showProgressBar = "ShowProgressBar"
     }
     
     // MARK: Init
@@ -228,6 +230,7 @@ final class PrompterViewModel: ObservableObject {
         $prompterTheme.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $horizontalAlignment.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
         $textAlignment.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
+        $showProgressBar.sink { [weak self] _ in self?.saveSettings() }.store(in: &cancellables)
     }
     
     private func loadSettings() {
@@ -275,6 +278,8 @@ final class PrompterViewModel: ObservableObject {
         if let textAlignRaw = defaults.string(forKey: Keys.textAlignment) {
             textAlignment = PrompterTextAlignment(rawValue: textAlignRaw) ?? .center
         }
+        
+        showProgressBar = defaults.object(forKey: Keys.showProgressBar) as? Bool ?? true
     }
     
     private func saveSettings() {
@@ -299,6 +304,7 @@ final class PrompterViewModel: ObservableObject {
         defaults.set(prompterTheme.rawValue, forKey: Keys.prompterTheme)
         defaults.set(horizontalAlignment.rawValue, forKey: Keys.horizontalAlignment)
         defaults.set(textAlignment.rawValue, forKey: Keys.textAlignment)
+        defaults.set(showProgressBar, forKey: Keys.showProgressBar)
     }
     
     // MARK: Connector for display refresh
@@ -396,6 +402,26 @@ extension Font.Design: RawRepresentable {
         case .rounded: return "Rounded"
         case .monospaced: return "Monospaced"
         @unknown default: return "Default"
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .default: return "Aa"
+        case .serif: return "Aa"
+        case .rounded: return "Aa"
+        case .monospaced: return "Aa"
+        @unknown default: return "Aa"
+        }
+    }
+    
+    var previewFont: Font {
+        switch self {
+        case .default: return .system(size: 20, weight: .medium, design: .default)
+        case .serif: return .system(size: 20, weight: .medium, design: .serif)
+        case .rounded: return .system(size: 20, weight: .medium, design: .rounded)
+        case .monospaced: return .system(size: 20, weight: .medium, design: .monospaced)
+        @unknown default: return .system(size: 20, weight: .medium, design: .default)
         }
     }
 }

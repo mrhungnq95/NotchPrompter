@@ -175,9 +175,10 @@ struct PrompterContentView: View {
                 }
                 .clipped()
                 .onChange(of: viewModel.offset) { _, newValue in
-                    if contentHeight > 0, newValue > contentHeight {
-                        //we've scrolled past the end
-                        viewModel.offset = 0 // restarts
+                    if contentHeight > 0, newValue >= contentHeight {
+                        // We've scrolled past the end - stop at the end
+                        viewModel.offset = contentHeight
+                        viewModel.pause()
                     }
                 }
                 .onChange(of: viewModel.text) { _, _ in
@@ -323,7 +324,7 @@ struct PrompterContentView: View {
 
     private var textBlock: some View {
         let base = viewModel.text.isEmpty ? "Put some text in Settings..." : viewModel.text
-        let text = "\n" + base + "\n\n🏁\n\n"
+        let text = "\n" + base + "\n\n[the end]"
         
         return Text(attributedText(from: text))
             .multilineTextAlignment(viewModel.textAlignment.swiftUIAlignment)
