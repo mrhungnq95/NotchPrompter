@@ -325,13 +325,11 @@ struct PrompterContentView: View {
     }
     
     private var movingText: some View {
-        // Duplicate the text once to create a seamless loop
         return VStack(spacing: viewModel.lineHeight) {
             textBlock
-            textBlock
         }
-        .padding(.vertical, 24)
-        .padding(.horizontal, 24)
+        .padding(.horizontal, 16)
+        .padding(.top, 32)
     }
 
     private var textBlock: some View {
