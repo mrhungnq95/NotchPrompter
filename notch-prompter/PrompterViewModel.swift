@@ -556,7 +556,7 @@ enum PrompterTheme: String, CaseIterable {
     case dark = "dark"
     case light = "light"
     
-    var displayName: String {
+    var displayName: LocalizedStringKey {
         switch self {
         case .dark: return "Dark"
         case .light: return "Light"
@@ -591,7 +591,7 @@ enum PrompterHorizontalAlignment: String, CaseIterable {
     case center = "center"
     case right = "right"
     
-    var displayName: String {
+    var displayName: LocalizedStringKey {
         switch self {
         case .left: return "Left"
         case .center: return "Center"
@@ -614,7 +614,7 @@ enum PrompterTextAlignment: String, CaseIterable {
     case center = "center"
     case trailing = "trailing"
     
-    var displayName: String {
+    var displayName: LocalizedStringKey {
         switch self {
         case .leading: return "Left"
         case .center: return "Center"
@@ -638,4 +638,3 @@ enum PrompterTextAlignment: String, CaseIterable {
         }
     }
 }
-

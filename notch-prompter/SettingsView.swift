@@ -1,16 +1,26 @@
 import SwiftUI
 
 // MARK: - Settings Tabs
-enum SettingsTab: String, CaseIterable, Identifiable {
-    case script = "Script"
-    case appearance = "Appearance"
-    case layout = "Layout"
-    case behavior = "Behavior"
-    case voice = "Voice"
-    case shortcuts = "Shortcuts"
-
+enum SettingsTab: CaseIterable, Identifiable {
+    case script
+    case appearance
+    case layout
+    case behavior
+    case voice
+    case shortcuts
     
-    var id: String { rawValue }
+    var id: Self { self }
+    
+        var label: LocalizedStringResource {
+            switch self {
+            case .script: return "Script"
+            case .appearance: return "Appearance"
+            case .layout: return "Layout"
+            case .behavior: return "Behavior"
+            case .voice: return "Voice"
+            case .shortcuts: return "Shortcuts"
+            }
+        }
     
     var icon: String {
         switch self {
@@ -85,7 +95,7 @@ struct SettingsView: View {
                         Image(systemName: tab.icon)
                             .font(.system(size: 12, weight: .medium))
                             .frame(width: 16)
-                        Text(tab.rawValue)
+                        Text(tab.label)
                             .font(.system(size: 13, weight: .regular))
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -108,7 +118,7 @@ struct SettingsView: View {
                     .opacity(0.6)
             }
             .padding(12)
-            .frame(width: 160)
+            .frame(width: 170)
             .frame(maxHeight: .infinity)
             .background(Color.primary.opacity(0.04))
 
@@ -251,116 +261,6 @@ struct ScriptTabView: View {
     }
 }
 
-// MARK: - Highlighting Text Editor
-struct HighlightingTextEditor: NSViewRepresentable {
-    @Binding var text: String
-    var font: NSFont = .systemFont(ofSize: 15, weight: .regular)
-    var isFocused: FocusState<Bool>.Binding?
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    func makeNSView(context: Context) -> NSScrollView {
-        let scrollView = NSScrollView()
-        scrollView.hasVerticalScroller = true
-        scrollView.hasHorizontalScroller = false
-        scrollView.autohidesScrollers = true
-        scrollView.borderType = .noBorder
-        scrollView.drawsBackground = false
-        
-        let textView = NSTextView()
-        textView.isEditable = true
-        textView.isSelectable = true
-        textView.allowsUndo = true
-        textView.isRichText = false
-        textView.drawsBackground = false
-        textView.textContainerInset = NSSize(width: 5, height: 4)
-        textView.isAutomaticQuoteSubstitutionEnabled = false
-        textView.isAutomaticDashSubstitutionEnabled = false
-        textView.isAutomaticTextReplacementEnabled = false
-        textView.font = font
-        textView.delegate = context.coordinator
-        textView.textContainer?.widthTracksTextView = true
-        textView.isVerticallyResizable = true
-        textView.isHorizontallyResizable = false
-        textView.autoresizingMask = [.width]
-        
-        scrollView.documentView = textView
-        context.coordinator.textView = textView
-        
-        // Set initial text and apply highlighting
-        textView.string = text
-        context.coordinator.applyHighlighting(textView)
-        
-        return scrollView
-    }
-    
-    func updateNSView(_ scrollView: NSScrollView, context: Context) {
-        guard let textView = scrollView.documentView as? NSTextView else { return }
-        
-        if textView.string != text {
-            let selectedRanges = textView.selectedRanges
-            textView.string = text
-            textView.selectedRanges = selectedRanges
-            context.coordinator.applyHighlighting(textView)
-        }
-    }
-    
-    class Coordinator: NSObject, NSTextViewDelegate {
-        var parent: HighlightingTextEditor
-        weak var textView: NSTextView?
-        
-        private static let annotationPattern = try! NSRegularExpression(
-            pattern: "\\[[^\\]]+\\]",
-            options: []
-        )
-        
-        init(_ parent: HighlightingTextEditor) {
-            self.parent = parent
-        }
-        
-        func textDidChange(_ notification: Notification) {
-            guard let textView = notification.object as? NSTextView else { return }
-            parent.text = textView.string
-            applyHighlighting(textView)
-        }
-        
-        func applyHighlighting(_ textView: NSTextView) {
-            guard let textStorage = textView.textStorage else { return }
-            let fullRange = NSRange(location: 0, length: textStorage.length)
-            let text = textStorage.string
-            
-            // Preserve selection
-            let selectedRanges = textView.selectedRanges
-            
-            textStorage.beginEditing()
-            
-            // Reset to default style
-            let defaultAttributes: [NSAttributedString.Key: Any] = [
-                .font: parent.font,
-                .foregroundColor: NSColor.labelColor
-            ]
-            textStorage.setAttributes(defaultAttributes, range: fullRange)
-            
-            // Highlight [bracket] annotations
-            let matches = Self.annotationPattern.matches(in: text, options: [], range: fullRange)
-            for match in matches {
-                let annotationAttributes: [NSAttributedString.Key: Any] = [
-                    .font: NSFontManager.shared.convert(parent.font, toHaveTrait: .italicFontMask),
-                    .foregroundColor: NSColor.secondaryLabelColor,
-                    .backgroundColor: NSColor.secondaryLabelColor.withAlphaComponent(0.08)
-                ]
-                textStorage.addAttributes(annotationAttributes, range: match.range)
-            }
-            
-            textStorage.endEditing()
-            
-            // Restore selection
-            textView.selectedRanges = selectedRanges
-        }
-    }
-}
 
 // MARK: - Appearance Tab
 struct AppearanceTabView: View {
@@ -385,7 +285,7 @@ struct AppearanceTabView: View {
                                 VStack(spacing: 4) {
                                     Text(design.icon)
                                         .font(design.previewFont)
-                                    Text(design.displayName)
+                                    Text(design.displayLocalizedName)
                                         .font(.system(size: 11))
                                 }
                                 .frame(maxWidth: .infinity)
@@ -930,7 +830,7 @@ struct KeyboardTabView: View {
 // MARK: Shortcut row
 struct ShortcutRow: View {
     let icon: String
-    let title: String
+    let title: LocalizedStringKey
     let shortcut: String
     
     var body: some View {
@@ -959,7 +859,7 @@ struct ShortcutRow: View {
 
 // MARK: - Slider Component
 struct SettingSlider: View {
-    let label: String
+    let label: LocalizedStringKey
     @Binding var value: Double
     let range: ClosedRange<Double>
     let step: Double
