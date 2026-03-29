@@ -27,9 +27,7 @@ Perfect for quick videos, or keeping important text visible while you work.
 
 ## How to install?
 
-Head to [Releases](https://github.com/jpomykala/NotchPrompter/releases) and download zip file for the latest version. Unzip it and move **notch-prompter.app** to your **Applications** folder.
-
-[Help me fund the Apple License](https://jpomykala.gumroad.com/l/notchprompter) to publish the app in AppStore for easy updates. 😬
+Head to [Releases](https://github.com/jpomykala/NotchPrompter/releases) and download zip file for the latest version. Unzip it and move **NotchPrompter.app** to your **Applications** folder.
 
 ## Contributing
 All contributions are welcome! Whether you're fixing bugs, improving the UI, or adding new features, your help is appreciated.
